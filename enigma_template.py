@@ -8,17 +8,23 @@ import random
 
 # we'll be using this string for the majority of our translations
 alphabet = "abcdefghijklmnopqrstuvwxyz"
-len(alphabet)
 
 
 # user inputs a message and selects a key (or random), the message is then translated using the cipher
 def encode_message():
-    key = (random.randint(0, 25))
+    key_select = input(f"Would you like to select your key? (y/N).").lower()
+    if key_select == "y":
+        key = int(input(f"Please select a key")) % 26
+    else:
+        key = (random.randint(0, 25))
     encoded_msg = ""
     msg = input("Please input a message to encode.").lower()
     for char in msg:
-        msg_char = alphabet[(alphabet.index(char)+key) % 26]
-        encoded_msg += msg_char
+        try:
+            msg_char = alphabet[(alphabet.index(char)+key) % 26]
+            encoded_msg += msg_char
+        except ValueError:
+            encoded_msg += char
     print(f"Your message is now encoded as: '{encoded_msg}'. The key used to get this message is: {key}")
     pass
 
@@ -28,10 +34,23 @@ def encode_file():
     x = 0
     while x == 0:
         try:
-            f = open(input("What file will you be opening?"))
-            awesome = f.count("x")
-            print(f.read())
-            print(awesome)
+            file = open(input("What file do you want to encode?"), "r")
+            key = (random.randint(0, 25))
+            textfile = file.read()
+            encoded_file = ""
+            for char in textfile:
+                try:
+                    msg_char = alphabet[(alphabet.index(char) + key) % 26]
+                    encoded_file += msg_char
+                    x = 1
+                except ValueError:
+                    encoded_file += char
+            file = open(file, "w")
+            file.write(encoded_file)
+            file = open(file, "r")
+            print(file.read())
+            file.close()
+
 
         except FileNotFoundError:
             print("File not found.")
@@ -46,7 +65,7 @@ def decode_file():
 
 # runs if the key is unknown. If this is true, print out all possible decoding combinations.
 def decode_unknown_key(filename):
-   pass
+    pass
 
 
 # main method declaration
