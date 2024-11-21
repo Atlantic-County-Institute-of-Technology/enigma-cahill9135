@@ -21,7 +21,7 @@ def encode_message():
     msg = input("Please input a message to encode.").lower()
     for char in msg:
         try:
-            msg_char = alphabet[(alphabet.index(char)+key) % 26]
+            msg_char = alphabet[(alphabet.index(char) + key) % 26]
             encoded_msg += msg_char
         except ValueError:
             encoded_msg += char
@@ -37,7 +37,7 @@ def encode_file():
             file_name = input("What file will you be encoding?")
             file = open(file_name, "r")
             key = (random.randint(0, 25))
-            textfile = file.read()
+            textfile = file.read().lower()
             encoded_file = ""
             x = 1
             for char in textfile:
@@ -67,30 +67,30 @@ def decode_file():
     except FileNotFoundError:
         print("File not found.")
 
-    code_known = input("Is the key for the decoding known? (y/N")
+    code_known = input("Is the key for the decoding known? (y/N)")
     if code_known == "y":
         x = 0
         while x == 0:
-                y = 0
-                while y == 0:
-                    try:
-                        key = int(input("What key was used for this file"))
-                        y = 1
-                    except ValueError:
-                        print("Improper input.")
-                textfile = file.read()
-                decoded_file = ""
-                x = 1
-                for char in textfile:
-                    try:
-                        msg_char = alphabet[(alphabet.index(char) - key) % 26]
-                        decoded_file += msg_char
-                    except ValueError:
-                        decoded_file += char
-                file = open(file_name, "w")
-                file.write(decoded_file)
-                file.close()
-                print("Your file has been decoded.")
+            y = 0
+            while y == 0:
+                try:
+                    key = int(input("What key was used for this file"))
+                    y = 1
+                except ValueError:
+                    print("Improper input.")
+            textfile = file.read().lower()
+            decoded_file = ""
+            x = 1
+            for char in textfile:
+                try:
+                    msg_char = alphabet[(alphabet.index(char) - key) % 26]
+                    decoded_file += msg_char
+                except ValueError:
+                    decoded_file += char
+            file = open(file_name, "w")
+            file.write(decoded_file)
+            file.close()
+            print("Your file has been decoded.")
 
     else:
         # use 48 letters for simplicity
@@ -100,18 +100,35 @@ def decode_file():
 
 # runs if the key is unknown. If this is true, print out all possible decoding combinations.
 def decode_unknown_key(filename):
-    length = 48
+    # excerpt length = 48
+    # i is alphabet length to sift through different keys
     file = open(filename, "r")
-    textfile = file.read()
-    decodedfile = ""
-    for i in range(48):
+    textfile = file.read().lower()
+    for i in range(26):
+        decodedfile = ""
         for char in textfile[:48]:
             try:
-                msg_char = alphabet[(alphabet.index(char) - i) % 26]
+                msg_char = alphabet[(alphabet.index(char) + i) % 26]
                 decodedfile += msg_char
             except ValueError:
                 decodedfile += char
-            
+        print(decodedfile)
+        corr_ident = input("Is this a correctly decoded excerpt? (y/N)")
+        if corr_ident == "y":
+            key = i
+            decodedfile = ""
+            for char in textfile:
+                try:
+                    msg_char = alphabet[(alphabet.index(char) + key) % 26]
+                    decodedfile += msg_char
+                except ValueError:
+                    decodedfile += char
+            file = open(filename, "w")
+            file.write(decodedfile)
+            file.close()
+            print("Your file has been decoded.")
+            break
+
 
 
 # main method declaration
