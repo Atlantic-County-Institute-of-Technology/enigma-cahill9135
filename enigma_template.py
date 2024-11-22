@@ -12,25 +12,31 @@ alphabet = "abcdefghijklmnopqrstuvwxyz"
 
 # user inputs a message and selects a key (or random), the message is then translated using the cipher
 def encode_message():
+    # Inputs a key that must be a number, automatically makes it in range of 0-25 or makes it a random code
     key_select = input(f"Would you like to select your key? (y/N).").lower()
     if key_select == "y":
         key = int(input(f"Please select a key")) % 26
     else:
         key = (random.randint(0, 25))
+    # variable for the encoded message and the input for the user to send the message they want encoded
     encoded_msg = ""
     msg = input("Please input a message to encode.").lower()
+    # Encodes using alphabet index manipulation, then adds the letter. If the letter is a special char, add the special
+    # char without index manipulation.
     for char in msg:
         try:
             msg_char = alphabet[(alphabet.index(char) + key) % 26]
             encoded_msg += msg_char
         except ValueError:
             encoded_msg += char
+    # prints the new pretty encoded message
     print(f"Your message is now encoded as: '{encoded_msg}'. The key used to get this message is: {key}")
     pass
 
 
 # encodes a target file, similarly to encode_message, except now targeting a filename
 def encode_file():
+    # Asks for file to encode, loops back if the file isn't real.
     x = 0
     while x == 0:
         try:
@@ -40,12 +46,14 @@ def encode_file():
             textfile = file.read().lower()
             encoded_file = ""
             x = 1
+            # Same process as before, just instead within a now opened file.
             for char in textfile:
                 try:
                     msg_char = alphabet[(alphabet.index(char) + key) % 26]
                     encoded_file += msg_char
                 except ValueError:
                     encoded_file += char
+            # Opens file to rewrite it then opens it as "read" to print for the user to view.
             file = open(file_name, "w")
             file.write(encoded_file)
             file = open(file_name, "r")
@@ -61,11 +69,16 @@ def encode_file():
 # decodes target file using a user-specified key. If key is unknown, a keypress should
 # call decode_unknown_key()
 def decode_file():
-    try:
-        file_name = input("What file will you be decoding?")
-        file = open(file_name, "r")
-    except FileNotFoundError:
-        print("File not found.")
+    # Reverses the process from before, they input a file and subtract the key they know from the index in order to
+    # decode the file.
+    z = 0
+    while z == 0:
+        try:
+            file_name = input("What file will you be decoding?")
+            file = open(file_name, "r")
+            z = 1
+        except FileNotFoundError:
+            print("File not found.")
 
     code_known = input("Is the key for the decoding known? (y/N)")
     if code_known == "y":
@@ -91,27 +104,32 @@ def decode_file():
             file.write(decoded_file)
             file.close()
             print("Your file has been decoded.")
-
+    # Sends them to the unknown key decoder if they don't know the key
     else:
-        # use 48 letters for simplicity
         decode_unknown_key(file_name)
         pass
 
 
 # runs if the key is unknown. If this is true, print out all possible decoding combinations.
 def decode_unknown_key(filename):
-    # excerpt length = 48
-    # i is alphabet length to sift through different keys
+    # use 48 letters for simplicity, function subtracts 8 every time if they're out of index range for the file.
+    ex_len = 48
+    # 'i' is alphabet length to sift through different keys
     file = open(filename, "r")
     textfile = file.read().lower()
+    # Decodes excerpt from file and asks user if it's a correctly written excerpt.
+    # If it is, decode full file and rewrite.
     for i in range(26):
         decodedfile = ""
-        for char in textfile[:48]:
-            try:
-                msg_char = alphabet[(alphabet.index(char) + i) % 26]
-                decodedfile += msg_char
-            except ValueError:
-                decodedfile += char
+        try:
+            for char in textfile[:ex_len]:
+                try:
+                    msg_char = alphabet[(alphabet.index(char) + i) % 26]
+                    decodedfile += msg_char
+                except ValueError:
+                    decodedfile += char
+        except IndexError:
+            ex_len = ex_len - 8
         print(decodedfile)
         corr_ident = input("Is this a correctly decoded excerpt? (y/N)")
         if corr_ident == "y":
@@ -128,7 +146,6 @@ def decode_unknown_key(filename):
             file.close()
             print("Your file has been decoded.")
             break
-
 
 
 # main method declaration
@@ -159,3 +176,4 @@ def main():
 # runs on program start
 if __name__ == "__main__":
     main()
+    
